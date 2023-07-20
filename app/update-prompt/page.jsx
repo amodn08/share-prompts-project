@@ -20,10 +20,10 @@ const EditPrompt = () => {
       const response = await fetch(`/api/prompt/${promptId}`);
       const data = await response.json();
 
-      setPost = {
+      setPost ({
         prompt: data.prompt,
         tag: data.tag,
-      };
+      });
     };
 
     if (promptId) getPromptDetails();

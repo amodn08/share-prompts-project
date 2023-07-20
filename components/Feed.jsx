@@ -3,25 +3,10 @@
 import { useState, useEffect } from "react";
 import PromptCard from "./PromptCard";
 
-const PromptCardList = ({ data, handleTagClick }) => {
-  return (
-    <div className="mt-16 prompt_layout">
-      {data.map((post) => (
-        <PromptCard
-          key={post._id}
-          post={post}
-          handleTagClick={handleTagClick}
-        />
-      ))}
-    </div>
-  );
-};
-
 const Feed = () => {
   const [searchText, setSearchText] = useState("");
   const [posts, setPosts] = useState([]);
-
-  const handleSearchChange = (e) => {};
+  const [filteredResults, setFilteredResults] = useState([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -35,6 +20,43 @@ const Feed = () => {
     fetchPosts();
   }, []);
 
+  const searchItems = (searchText) => {
+    setSearchText(searchText);
+    if (searchText !== "") {
+      const filteredData = posts.filter((item) => {
+        return Object.values(item)
+          .join("")
+          .toLowerCase()
+          .includes(searchText.toLowerCase());
+      });
+      setFilteredResults(filteredData);
+    } else {
+      setFilteredResults(posts);
+    }
+  };
+
+  const PromptCardList = ({ data, handleTagClick }) => {
+    return (
+      <div className="mt-16 prompt_layout">
+        {searchText.length > 1
+          ? filteredResults.map((post) => (
+              <PromptCard
+                key={post._id}
+                post={post}
+                handleTagClick={handleTagClick}
+              />
+            ))
+          : data.map((post) => (
+              <PromptCard
+                key={post._id}
+                post={post}
+                handleTagClick={handleTagClick}
+              />
+            ))}
+      </div>
+    );
+  };
+
   return (
     <section className="feed">
       <form className="relative w-full flex-center">
@@ -42,7 +64,7 @@ const Feed = () => {
           type="text"
           placeholder="Search for a tag or a username"
           value={searchText}
-          onChange={handleSearchChange}
+          onChange={(e) => searchItems(e.target.value)}
           required
           className="search_input peer"
         />
